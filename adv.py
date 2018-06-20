@@ -4,7 +4,7 @@ import random
 import time
 
 DEBUG = False # True
-SUSPENSE_LEVEL = 0 # 0.5
+SUSPENSE_LEVEL = 0.1
 
 LEVEL = 0
 NPC = 0
@@ -14,16 +14,36 @@ PLAY = True
 FIGHT = False
 BRIBE = False
 
+weapons = {'knife':{'image':"asciiart/knife"}, 'axe':{'image':"asciiart/axe"}}
+
 characters = {}
 
 def outcome(probability):
     return random.random() < probability
 
+def display_weapon(weapon):
+    if len(weapons[weapon]['image']) > 0: # display the ascii art for the weapon
+        image_file=open(weapons[weapon]['image'])
+        print(image_file.read())
+        image_file.close()
+
+def display_asciiart(image):
+    image_file=open('asciiart/'+image, 'rU', encoding='ansi')
+    print(image_file.read())
+    image_file.close()
+
 def attack(attacking, defending):
     if outcome(characters[attacking]['hit']):
         if outcome(characters[defending]['block']):
+            if characters[defending]['shield'] > 0:
+                display_asciiart('shield')
+            else:
+                display_asciiart('blocked')
             return "Blocked!"
         else:
+            display_asciiart('strike')
+            if characters[attacking]['weapon']:
+                display_weapon(characters[attacking]['weapon'])
             event = ''
             damage = random.randint(1, characters[attacking]['strength'])
             if characters[defending]['shield'] > damage:
@@ -35,6 +55,7 @@ def attack(attacking, defending):
                     characters[defending]['shield'] = 0
                     event += defending + " lost their shield ... "
                     characters[defending]['block'] -= 0.1
+                    display_asciiart('broken_shield') # display the broken shield ascii art
                 if characters[defending]['health'] > damage:
                     characters[defending]['health'] -= damage
                     event += "Health depletion: " + str(damage) + " ... "
@@ -43,6 +64,7 @@ def attack(attacking, defending):
                     characters[defending]['status'] = "dead" 
                     event += "It\'s a fatal blow! ... " + defending +  " is dead! ... "
                     if characters[defending]['gold']:
+                        display_asciiart('gold')
                         event += attacking + " takes " + str(characters[defending]['gold']) + " gold ... "
                         characters[attacking]['gold'] += characters[defending]['gold'] # pick up their gold
                         characters[defending]['gold'] = 0
@@ -52,8 +74,10 @@ def attack(attacking, defending):
                         characters[defending]['healing'] = 0
                     if characters[defending]['weapon']:
                         if characters[attacking]['weapon'] == False:
-                            event += attacking + " takes the " + characters[defending]['weapon'] + " ... "
-                            characters[attacking]['weapon'] = characters[defending]['weapon'] # pick up their weapon
+                            weapon = characters[defending]['weapon']
+                            display_weapon(weapon)
+                            event += attacking + " takes the " + weapon + " ... "
+                            characters[attacking]['weapon'] = weapon # pick up their weapon
                             characters[attacking]['hit'] += 0.1 # attack bonus
                         characters[defending]['weapon'] = False
             return "Strike! ... " + event
@@ -69,9 +93,14 @@ def create_character(name, weapon, shield):
     characters[name]['status'] = "alive"
 
     if weapon:
-        characters[name]['weapon'] = "knife"
-        characters[name]['strength'] = random.randint(20,50)
-        characters[name]['hit'] = random.randint(20,90) / 100
+        if outcome(0.5):
+            characters[name]['weapon'] = "axe"
+            characters[name]['strength'] = random.randint(30,60)
+            characters[name]['hit'] = random.randint(30,90) / 100
+        else:
+            characters[name]['weapon'] = "knife"
+            characters[name]['strength'] = random.randint(20,50)
+            characters[name]['hit'] = random.randint(20,90) / 100
     else:
         characters[name]['strength'] = random.randint(10,40)
         characters[name]['hit'] = random.randint(10,80) / 100
@@ -120,24 +149,54 @@ team = [create_character("Player " + str(p), outcome(0.6), outcome(0.6)) for p i
 if DEBUG: print("Characters: " + format(characters))
 if DEBUG: print("Team: " + format(team))
 
+
+display_asciiart('castle')
+
 while team and QUIT == False:
 
     add_suspense()
 
     print("\nYou are currently in LEVEL " + str(LEVEL) + " ... ")
-    horde_size = random.randint(2,3)
-    horde = [create_character("NPC " + str(h), outcome(0.4), outcome(0.4)) for h in range(NPC, NPC + horde_size)]
-    NPC += horde_size
 
     print("\nYour team\'s status:")
     for player in team:
         status(player)
 
     add_suspense()
+    print("\nPress ENTER to continue\n")  
+    input()
 
-    print("\nA horde approaches:")
-    for npc in horde:
-        status(npc)
+    add_suspense()
+
+    if outcome(0.2): # 20% chance of spawning a MONSTER
+        if outcome(0.1): # 1 in 10 chance of spawning a DEMON
+            horde = [create_character("Demon", False, False)]
+            display_asciiart('demon')
+        elif outcome(0.1): # 1 in 10 chance of spawning a DRAGON
+            horde = [create_character("Dragon", False, False)]
+            display_asciiart('dragon')
+        elif outcome(0.1): # 1 in 10 chance of spawning a GIANT ANT
+            horde = [create_character("Giant ant", False, False)]
+            display_asciiart('giant_ant')
+        elif outcome(0.1): # 1 in 10 chance of spawning a CYCLOPS
+            horde = [create_character("Snake", False, False)]
+            display_asciiart('snake')
+        elif outcome(0.1): # 1 in 10 chance of spawning a CYCLOPS
+            horde = [create_character("Cyclops", False, False)]
+            display_asciiart('cyclops')
+        else: # spawn 3 BATS
+            horde = [create_character("Bat " + str(h), False, False) for h in range(NPC, NPC + 3)]
+            NPC += 3
+            display_asciiart('bats')
+    else: # just spawn a horde of skeletons
+        horde_size = random.randint(1,3)
+        horde = [create_character("Skeleton " + str(h), outcome(0.4), outcome(0.4)) for h in range(NPC, NPC + horde_size)]
+        NPC += horde_size
+        display_asciiart('skeleton')
+
+    if DEBUG:
+        for npc in horde:
+            status(npc)
 
     add_suspense()  
 
@@ -156,6 +215,7 @@ while team and QUIT == False:
 
     if BRIBE: 
         if DEBUG: print("Team: " + format(team))
+        display_asciiart('gold')
         for player in team:
             if DEBUG: print("Player: " + format(player))
             if BRIBE: 
@@ -168,12 +228,13 @@ while team and QUIT == False:
                             characters[player]['gold'] -= bribe
                             add_suspense()
                     else:
-                        print("\aThere is not enough gold to bribe the horde! ... You will have to fight them! ")
+                        print("\aThere is not enough gold! ... You will have to fight them! ")
                         BRIBE = False
                         FIGHT = True
                         add_suspense()
                         break
         LEVEL += 1
+        display_asciiart('passage')
 
     if FIGHT:
         add_suspense()
@@ -189,6 +250,8 @@ while team and QUIT == False:
                         add_suspense()                    
                     if characters[npc]['status'] == 'alive' and characters[player]['status'] == 'alive':
                         print(f"{npc} attacks {player} :", end=" ")
+                        if characters[npc]['weapon'] == "knife":
+                            display_asciiart('skeleton_attacks')
                         add_suspense()
                         print(f"{attack(npc, player)}")
                         add_suspense()
@@ -208,6 +271,8 @@ while team and QUIT == False:
             add_suspense()
             heal_team()
             LEVEL += 1
+            display_asciiart('passage')
+            print("You continue on to the next room ...\n")
         else:
             print("Your team was defeated!!!\n")
             add_suspense()
