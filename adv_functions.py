@@ -1,12 +1,10 @@
 #! python
 from sys import stdout
+from os import system
 import random
 import time
+
 import inflect
-
-DEBUG = False # True
-SUSPENSE_LEVEL = 0.1
-
 inflect = inflect.engine()
 
 characters = {}
@@ -29,16 +27,24 @@ def display_asciiart(image):
 def display_text_file(filename):
     text_file=open('text/'+filename, 'rU', encoding='ansi')
     for line in text_file:
-        if line.startswith("text"):
-            print (line[5:])
-        elif line.startswith("pause"):
-            pause = int(line[6:])
+        if line.startswith("text "):
+            print(line[5:])
+        elif line.startswith("talk "):
+            talk = line[5:]
+            for char in talk:
+                stdout.write(char)
+                stdout.flush()
+                time.sleep(0.05)
+        elif line.startswith("pause "):
+            pause = int(line[6:].rstrip())
             time.sleep(pause)
-        elif line.startswith("ascii"):
-            display_asciiart(line[6:])
+        elif line.startswith("ascii "):
+            display_asciiart(line[6:].rstrip())
         elif line.startswith("continue"):
             input("Press RETURN to continue...")
-    stdout.flush()
+        elif line.startswith("clear"):
+            system('clear')
+        stdout.flush()
     text_file.close()
 
 def chapter_text(level, sub_level):
@@ -97,9 +103,11 @@ def attack(attacking, defending):
     else:
         return "Miss!"
 
-def create_character(name, weapon, shield):
+def create_character(name, weapon, strength, shield, bribe):
     characters[name] = {}
     characters[name]['weapon'] = weapon
+    characters[name]['strength'] = strength
+    characters[name]['bribe'] = bribe
     characters[name]['health'] = random.randint(50, 100)
     characters[name]['gold'] = random.randint(0, 100)
     characters[name]['healing'] = random.randint(0,50)
@@ -108,7 +116,7 @@ def create_character(name, weapon, shield):
     if weapon:
         if outcome(0.5):
             characters[name]['weapon'] = "axe"
-            characters[name]['strength'] = random.randint(30,60)
+            characters[name]['strength'] += random.randint(30,60)
             characters[name]['hit'] = random.randint(30,90) / 100
         else:
             characters[name]['weapon'] = "knife"
@@ -150,9 +158,54 @@ def heal_team(team):
             if characters[player]['health'] > 100:
                 characters[player]['healing'] = characters[player]['health'] - 100 # remaining health potion
                 characters[player]['health'] = 100
-            add_suspense()
 
-def add_suspense():
-    if DEBUG == False:
-        stdout.flush()
-        time.sleep(SUSPENSE_LEVEL)
+def add_suspense(time_to_sleep, debug):
+    stdout.flush()
+    if debug == False:
+        time.sleep(time_to_sleep)
+
+def generate_horde():
+    if outcome(0.2): # 20% chance of spawning a MONSTER
+        if outcome(0.1): horde = [create_character("Demon", False, 200, False, 0)]
+        elif outcome(0.1): horde = [create_character("Dragon", False, 250, False, 0)]
+        elif outcome(0.1): horde = [create_character("Giant ant", False, 80, False, 0)]
+        elif outcome(0.1): horde = [create_character("Snake", False, 100, False, 0)]
+        elif outcome(0.1): horde = [create_character("Cyclops", False, 200, False, 1000)]
+        elif outcome(0.1): horde = [create_character("Gargoyle", False, 90, False, 0)]
+        elif outcome(0.1): horde = [create_character("Goblin", False, 60, False, 500)]
+        elif outcome(0.1): horde = [create_character("Spider", False, 80, False, 0)]
+        elif outcome(0.1): horde = [create_character("Wolf", False, 70, False, 0)]
+        elif outcome(0.1): horde = [create_character("Scorpion", False, 100, False, 0)]
+        elif outcome(0.1): horde = [create_character("Ogre", False, 100, False, 200)]
+        elif outcome(0.1): horde = [create_character("Minotaur", False, 150, False, 0)]
+        elif outcome(0.1): horde = [create_character("Horseman", False, 100, False, 0)]
+        elif outcome(0.1): horde = [create_character("Knight", False, 100, False, 500)]
+        elif outcome(0.1): horde = [create_character("Medusa", False, 100, False, 0)]
+        elif outcome(0.1): horde = [create_character("Cerberus", False, 100, False, 0)]
+        else: horde = [create_character("Bat " + str(h), False, 30, False, 0) for h in range(0, 3)]
+    else: # just spawn a horde of skeletons
+        horde = [create_character("Skeleton " + str(h), outcome(0.4), random.randint(30,60), outcome(0.4), random.randint(30,60)) for h in range(0, random.randint(1,3))]
+
+    return(horde)
+
+def display_horde(horde):
+    for npc in horde:
+        if npc == "Demon": display_asciiart('demon')
+        elif npc == "Dragon": display_asciiart('dragon')
+        elif npc == "Giant ant": display_asciiart('giant_ant')
+        elif npc == "Snake": display_asciiart('snake')
+        elif npc == "Cyclops": display_asciiart('cyclops')
+        elif npc == "Gargoyle": display_asciiart('gargoyle')
+        elif npc == "Goblin": display_asciiart('goblin')
+        elif npc == "Spider": display_asciiart('spider')
+        elif npc == "Wolf": display_asciiart('wolf')
+        elif npc == "Scorpion": display_asciiart('scorpion')
+        elif npc == "Ogre": display_asciiart('ogre')
+        elif npc == "Minotaur": display_asciiart('minotaur')
+        elif npc == "Horseman": display_asciiart('horseman')
+        elif npc == "Knight": display_asciiart('knight')
+        elif npc == "Medusa": display_asciiart('medusa')
+        elif npc == "Cerberus": display_asciiart('cerberus')
+        elif npc.startswith("Bat "): display_asciiart('bats')
+        else: 
+            display_asciiart('skeleton')

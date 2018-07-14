@@ -1,112 +1,58 @@
 #! python
+
 from sys import stdout
 import random
+import time
 import inflect
 import adv_functions as adv
 
-DEBUG = False # True
+DEBUG_MODE = False
+SUSPENSE_LEVEL = 0.1
 
 LEVEL = 1
-NPC = 0
 
 QUIT = False
 PLAY = True
 FIGHT = False
 BRIBE = False
   
-team = [adv.create_character("Player " + str(p), adv.outcome(0.6), adv.outcome(0.6)) for p in range(1,random.randint(2,5))]
+team = [adv.create_character("Player " + str(p), adv.outcome(0.6), 70, adv.outcome(0.6), 0) for p in range(1,random.randint(2,5))]
 
-if DEBUG: print("Characters: " + format(adv.characters))
-if DEBUG: print("Team: " + format(team))
-
-adv.chapter_text(LEVEL, "intro")
-adv.display_asciiart('castle')
+if DEBUG_MODE: 
+    print("Characters: " + format(adv.characters))
+    print("Team: " + format(team))
+else: 
+    adv.chapter_text(LEVEL, "intro")
+    adv.display_asciiart('castle')
 
 while team and QUIT == False:
 
-    adv.add_suspense()
-
-    if DEBUG: 
+    if DEBUG_MODE:
+        for key, value in adv.characters.items():
+            print (key, value)
+    else:
         print("\nYou are currently in LEVEL " + str(LEVEL) + " ... ")
-    
-    print("\nYour team\'s status:")
-    for player in team:
-        adv.status(player)
+        print("\nYour team\'s status:")
+        for player in team:
+            adv.status(player)
 
-    adv.add_suspense()
+    adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
     print("\nPress ENTER to continue\n")  
     input()
 
-    adv.add_suspense()
-
-    if adv.outcome(0.2): # 20% chance of spawning a MONSTER
-        if adv.outcome(0.1): # 1 in 10 chance of spawning a DEMON
-            horde = [adv.create_character("Demon", False, False)]
-            adv.display_asciiart('demon')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a DRAGON
-            horde = [adv.create_character("Dragon", False, False)]
-            adv.display_asciiart('dragon')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a GIANT ANT
-            horde = [adv.create_character("Giant ant", False, False)]
-            adv.display_asciiart('giant_ant')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a CYCLOPS
-            horde = [adv.create_character("Snake", False, False)]
-            adv.display_asciiart('snake')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a CYCLOPS
-            horde = [adv.create_character("Cyclops", False, False)]
-            adv.display_asciiart('cyclops')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a GARGOYLE
-            horde = [adv.create_character("Gargoyle", False, False)]
-            adv.display_asciiart('gargoyle')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a GOBLIN
-            horde = [adv.create_character("Goblin", False, False)]
-            adv.display_asciiart('goblin')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a SPIDER
-            horde = [adv.create_character("Spider", False, False)]
-            adv.display_asciiart('spider')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a WOLF
-            horde = [adv.create_character("Wolf", False, False)]
-            adv.display_asciiart('wolf')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a SCORPION
-            horde = [adv.create_character("Scorpion", False, False)]
-            adv.display_asciiart('scorpion')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a OGRE
-            horde = [adv.create_character("Ogre", False, False)]
-            adv.display_asciiart('ogre')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a MINOTAUR
-            horde = [adv.create_character("Minotaur", False, False)]
-            adv.display_asciiart('minotaur')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a HORSEMAN
-            horde = [adv.create_character("Horseman", False, False)]
-            adv.display_asciiart('horseman')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a KNIGHT
-            horde = [adv.create_character("Knight", False, False)]
-            adv.display_asciiart('knight')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a MEDUSA
-            horde = [adv.create_character("Medusa", False, False)]
-            adv.display_asciiart('medusa')
-        elif adv.outcome(0.1): # 1 in 10 chance of spawning a CERBERUS
-            horde = [adv.create_character("Cerberus", False, False)]
-            adv.display_asciiart('cerberus')
-        else: # spawn 3 BATS
-            horde = [adv.create_character("Bat " + str(h), False, False) for h in range(NPC, NPC + 3)]
-            NPC += 3
-            adv.display_asciiart('bats')
-    else: # just spawn a horde of skeletons
-        horde_size = random.randint(1,3)
-        horde = [adv.create_character("Skeleton " + str(h), adv.outcome(0.4), adv.outcome(0.4)) for h in range(NPC, NPC + horde_size)]
-        NPC += horde_size
-        adv.display_asciiart('skeleton')
-
-    if DEBUG:
+    adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
+    horde = adv.generate_horde()
+    if DEBUG_MODE: 
+        for npc in horde:
+            print(format(npc))
+    else:
+        adv.display_horde(horde)
         for npc in horde:
             adv.status(npc)
 
-    adv.add_suspense()  
-
     FIGHT = False
     BRIBE = False
-
+    adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
     decision = input("\nF to fight, B to bribe, Q to quit\t")
 
     if decision == 'F' or decision == 'f': FIGHT = True
@@ -115,50 +61,52 @@ while team and QUIT == False:
         QUIT = True
         break
     
-    adv.add_suspense()
+    adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
 
     if BRIBE: 
-        if DEBUG: print("Team: " + format(team))
-        adv.display_asciiart('gold')
+        if DEBUG_MODE == False: 
+            adv.display_asciiart('gold')
         for player in team:
-            if DEBUG: print("Player: " + format(player))
-            if BRIBE: 
-                for npc in horde:
-                    if DEBUG: print("Horde NPC: " + format(npc))
-                    if adv.characters[player]['gold']:
-                        bribe = random.randint(1,adv.characters[player]['gold'])
-                        if BRIBE:
-                            print(player + " pays " + str(bribe) + " gold to " + npc + " ... ")
-                            adv.characters[player]['gold'] -= bribe
-                            adv.add_suspense()
-                    else:
-                        print("\aThere is not enough gold! ... You will have to fight them! ")
-                        BRIBE = False
-                        FIGHT = True
-                        adv.add_suspense()
-                        break
-        #LEVEL += 1
+            if DEBUG_MODE: print("Player: " + format(player))
+
+            for npc in horde:
+                if DEBUG_MODE: 
+                    print("Horde NPC: " + format(npc) + " " + format(adv.characters[npc]))
+                if adv.characters[player]['gold']:
+                    bribe = random.randint(1,adv.characters[player]['gold'])
+                    if adv.characters[npc]['bribe'] > 0:
+                        print(player + " pays " + str(bribe) + " gold to " + npc + " ... ")
+                        adv.characters[player]['gold'] -= bribe
+                        adv.characters[npc]['gold'] += bribe
+                        adv.characters[npc]['bribe'] -= bribe
+                        adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
+                else:
+                    print("\aThere is not enough gold! ... You will have to fight them! ")
+                    BRIBE = False
+                    FIGHT = True
+                    adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
+                    break
         adv.display_asciiart('passage')
 
     if FIGHT:
-        adv.add_suspense()
+        adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
         print("\nBATTLE COMMENCES ...\n")
-        adv.add_suspense()
+        adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
         while team and horde:
             for player in team:
                 for npc in horde:
                     if adv.characters[player]['status'] == 'alive' and adv.characters[npc]['status'] == 'alive':
                         print(f"{player} attacks {npc} :", end=" ")
-                        adv.add_suspense()
+                        adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
                         print (f"{adv.attack(player, npc)}")
-                        adv.add_suspense()                    
+                        adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)                    
                     if adv.characters[npc]['status'] == 'alive' and adv.characters[player]['status'] == 'alive':
                         print(f"{npc} attacks {player} :", end=" ")
                         if adv.characters[npc]['weapon'] == "knife":
                             adv.display_asciiart('skeleton_attacks')
-                        adv.add_suspense()
+                        adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
                         print(f"{adv.attack(npc, player)}")
-                        adv.add_suspense()
+                        adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
             for player in team:
                 if adv.characters[player]['status'] == 'dead':
                     team.remove(player)
@@ -166,20 +114,20 @@ while team and QUIT == False:
                 if adv.characters[npc]['status'] == 'dead':
                     horde.remove(npc)
         
-        adv.add_suspense()            
+        adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)           
         print(f"\nOUTCOME:\n")
-        adv.add_suspense()
+        adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
 
         if team:            
             print("Your team was victorious!!!\n")
-            adv.add_suspense()
+            adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
             adv.heal_team(team)
             LEVEL += 1
             adv.display_asciiart('passage')
             print("You continue on to the next room ...\n")
         else:
             print("Your team was defeated!!!\n")
-            adv.add_suspense()
+            adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
 
 GOLD = 0
 for player in team:
@@ -188,7 +136,7 @@ for player in team:
 if GOLD:
     print("Your team escaped from level " + str(LEVEL) + " with " + str(GOLD) + " gold.\n")
 
-if DEBUG: 
+if DEBUG_MODE: 
     for key, value in adv.characters.items() :
         print (key, value)
 

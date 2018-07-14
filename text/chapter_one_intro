@@ -1,28 +1,31 @@
-text Chapter One - The Haunted Graveyard  
+clear
+talk Chapter One - The Haunted Graveyard  
 text ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-text 
-text Once upon one spooky Halloween day, there were four brave warriors.
-text Their King had sent them to find the Golden Fleece.
-pause 4
-text In front of them lay the Haunted Castle and its graveyard.
+talk Once upon one spooky Halloween day, there were four brave warriors.
+talk Their King had sent them to find the Golden Fleece.
+talk In front of them lay the Haunted Castle and its graveyard.
+talk They opened the gate and entered...
 pause 3
-text They opened the gate and entered...
-pause 3
-text Suddenly, skeletons of all sorts appeared out of their graves!
-pause 3
+pause
+clear
 ascii skeleton_attacks
-text Should they run away or fight?
+talk Suddenly, skeletons of all sorts appeared out of their graves!
+talk Should they run away or fight?
 pause 2
-text They decide to fight!   "CHARGE!!!"
+talk They decide to fight!   
 pause 2
-text But every time one skeleton was defeated, another one appeared...
+talk "CHARGE!!!"
 pause 2
-text ( That must be tiring, but there is a lot more where that came from... )
+talk But every time one skeleton was defeated, another one appeared...
 pause 2
-text Three days later...
+talk ( That must be tiring, but there is a lot more where that came from... )
+pause 2
+talk Three days later...
+pause 2
+talk "Phew!"
 pause 1
-text "Phew!  That was exhausting!"
-pause 2
+talk "That was exhausting!"
+pause 3
 continue 
 
 
