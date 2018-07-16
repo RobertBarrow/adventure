@@ -41,7 +41,7 @@ def display_text_file(filename):
         elif line.startswith("ascii "):
             display_asciiart(line[6:].rstrip())
         elif line.startswith("continue"):
-            input("Press RETURN to continue...")
+            input("Press ENTER to continue...")
         elif line.startswith("clear"):
             system('clear')
         stdout.flush()
