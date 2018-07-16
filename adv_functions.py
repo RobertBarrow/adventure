@@ -20,12 +20,12 @@ def display_weapon(weapon):
         image_file.close()
 
 def display_asciiart(image):
-    image_file=open('asciiart/'+image, 'rU', encoding='ansi')
+    image_file=open('asciiart/'+image, 'rU', encoding='latin1')
     print(image_file.read())
     image_file.close()
 
 def display_text_file(filename):
-    text_file=open('text/'+filename, 'rU', encoding='ansi')
+    text_file=open('text/'+filename, 'rU', encoding='latin1')
     for line in text_file:
         if line.startswith("text "):
             print(line[5:])
