@@ -1,0 +1,4 @@
+{
+    "knife":    {"image":"asciiart/knife"}, 
+    "axe":      {"image":"asciiart/axe"}
+}

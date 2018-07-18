@@ -1,0 +1,20 @@
+{
+    "Bats":     {"image":"asciiart/bats"},
+    "Cerberus": {"image":"asciiart/cerburus"},
+    "Cyclops":  {"image":"asciiart/cyclops"},
+    "Demon":    {"image":"asciiart/demon"},
+    "Dragon":   {"image":"asciiart/dragon"},
+    "Gargoyle": {"image":"asciiart/gargoyle"},
+    "Giant Ant":{"image":"asciiart/giant_ant"},
+    "Goblin":   {"image":"asciiart/goblin"},
+    "Horseman": {"image":"asciiart/horseman"},
+    "Knight":   {"image":"asciiart/knight"},
+    "Medusa":   {"image":"asciiart/medusa"},
+    "Minotaur": {"image":"asciiart/minotaur"},
+    "Ogre":     {"image":"asciiart/ogre"},
+    "Scorpion": {"image":"asciiart/scorpion"},
+    "Skeleton": {"image":"asciiart/skeleton"},
+    "Snake":    {"image":"asciiart/snake"},
+    "Spider":   {"image":"asciiart/spider"},
+    "Wolf":     {"image":"asciiart/wolf"}
+}

@@ -10,20 +10,23 @@ DEBUG_MODE = False
 SUSPENSE_LEVEL = 0.1
 
 LEVEL = 1
-
+GRIDREF = "D7"
 QUIT = False
 PLAY = True
 FIGHT = False
 BRIBE = False
-  
+
 team = [adv.create_character("Player " + str(p), adv.outcome(0.6), 70, adv.outcome(0.6), 0) for p in range(1,random.randint(2,5))]
 
 if DEBUG_MODE: 
     print("Characters: " + format(adv.characters))
     print("Team: " + format(team))
+    print("Weapons: " + format(adv.weapons))
+    print("Monsters: " + format(adv.monsters))
+    print("Map locations: " + format(adv.map_locations))
 else: 
     adv.chapter_text(LEVEL, "intro")
-    adv.display_asciiart('castle')
+    adv.display_asciiart("castle")
 
 while team and QUIT == False:
 
@@ -31,7 +34,11 @@ while team and QUIT == False:
         for key, value in adv.characters.items():
             print (key, value)
     else:
-        print("\nYou are currently in LEVEL " + str(LEVEL) + " ... ")
+        print("\nYou are currently in LEVEL " + str(LEVEL) + ", GRIDREF " + GRIDREF + " ... " + format(adv.map_locations["ValidLevels"][str(LEVEL)]["ValidGridRefs"][GRIDREF]['name']))
+        print("\nExits: ")
+        for exit in adv.map_locations["ValidLevels"][str(LEVEL)]["ValidGridRefs"][GRIDREF]['exits']:
+            visible_gridref = adv.map_locations["ValidLevels"][str(LEVEL)]["ValidGridRefs"][GRIDREF]['exits'][exit]
+            print("\n\t" + format(exit) + " - " + format(adv.map_locations["ValidLevels"][str(LEVEL)]["ValidGridRefs"][visible_gridref]['name']))
         print("\nYour team\'s status:")
         for player in team:
             adv.status(player)
@@ -63,30 +70,11 @@ while team and QUIT == False:
     
     adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
 
-    if BRIBE: 
-        if DEBUG_MODE == False: 
-            adv.display_asciiart('gold')
-        for player in team:
-            if DEBUG_MODE: print("Player: " + format(player))
-
-            for npc in horde:
-                if DEBUG_MODE: 
-                    print("Horde NPC: " + format(npc) + " " + format(adv.characters[npc]))
-                if adv.characters[player]['gold']:
-                    bribe = random.randint(1,adv.characters[player]['gold'])
-                    if adv.characters[npc]['bribe'] > 0:
-                        print(player + " pays " + str(bribe) + " gold to " + npc + " ... ")
-                        adv.characters[player]['gold'] -= bribe
-                        adv.characters[npc]['gold'] += bribe
-                        adv.characters[npc]['bribe'] -= bribe
-                        adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
-                else:
-                    print("\aThere is not enough gold! ... You will have to fight them! ")
-                    BRIBE = False
-                    FIGHT = True
-                    adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
-                    break
-        adv.display_asciiart('passage')
+    if BRIBE:
+        if adv.bribe(team, horde, DEBUG_MODE):
+            adv.display_asciiart('passage')
+        else:
+            FIGHT = True
 
     if FIGHT:
         adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
@@ -96,10 +84,14 @@ while team and QUIT == False:
             for player in team:
                 for npc in horde:
                     if adv.characters[player]['status'] == 'alive' and adv.characters[npc]['status'] == 'alive':
-                        print(f"{player} attacks {npc} :", end=" ")
-                        adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
-                        print (f"{adv.attack(player, npc)}")
-                        adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)                    
+                        if DEBUG_MODE:
+                            print(f"{player} attacks {npc} :", end=" ")
+                            print (f"{adv.attack(player, npc)}")
+                        else:
+                            adv.talk(player + " attacks " + npc + " : ")
+                            adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)
+                            adv.talk(adv.attack(player, npc))
+                            adv.add_suspense(SUSPENSE_LEVEL, DEBUG_MODE)                    
                     if adv.characters[npc]['status'] == 'alive' and adv.characters[player]['status'] == 'alive':
                         print(f"{npc} attacks {player} :", end=" ")
                         if adv.characters[npc]['weapon'] == "knife":

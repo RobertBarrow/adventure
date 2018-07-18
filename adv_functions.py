@@ -1,6 +1,7 @@
 #! python
 from sys import stdout
 from os import system
+import json
 import random
 import time
 
@@ -8,7 +9,6 @@ import inflect
 inflect = inflect.engine()
 
 characters = {}
-weapons = {'knife':{'image':"asciiart/knife"}, 'axe':{'image':"asciiart/axe"}}
 
 def outcome(probability):
     return random.random() < probability
@@ -209,3 +209,43 @@ def display_horde(horde):
         elif npc.startswith("Bat "): display_asciiart('bats')
         else: 
             display_asciiart('skeleton')
+
+def talk(text):
+    for char in text:
+        stdout.write(char)
+        stdout.flush()
+        time.sleep(0.05)
+
+def bribe(team, horde, debug):
+    if debug == False: 
+        display_asciiart('gold')
+    for player in team:
+        if debug: print("Player: " + format(player))
+        for npc in horde:
+            if characters[npc]['bribe'] > 0:
+                if debug: print("Horde NPC: " + format(npc) + " " + format(characters[npc]))
+                if characters[player]['gold']:
+                    bribe = random.randint(1,characters[player]['gold'])
+                    if characters[npc]['bribe'] > 0:
+                        talk(player + " pays " + str(bribe) + " gold to " + npc + " ... ")
+                        characters[player]['gold'] -= bribe
+                        characters[npc]['gold'] += bribe
+                        characters[npc]['bribe'] -= bribe
+                        if characters[npc]['bribe'] <= 0:
+                            characters[npc]['bribe'] = 0
+                            talk("Your attempt to bribe " + npc + " has worked and they leave you alone.\n")
+                            break
+    for npc in horde:
+        if characters[npc]['bribe'] > 0:
+            talk("\aYour attempt to bribe did not work! ... You will have to fight! \n")
+            return (False)
+    return (True)
+
+def load_data(filename):
+    with open("data/" + filename + ".json") as json_data:
+        data = json.load(json_data)
+    return(data)
+
+monsters = load_data("monsters")
+weapons = load_data("weapons")
+map_locations = load_data("map_locations")
