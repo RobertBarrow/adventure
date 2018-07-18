@@ -20,12 +20,12 @@ def display_weapon(weapon):
         image_file.close()
 
 def display_asciiart(image):
-    image_file=open('asciiart/'+image, 'rU', encoding='ansi')
+    image_file=open('asciiart/'+image, 'rU', encoding='latin1')
     print(image_file.read())
     image_file.close()
 
 def display_text_file(filename):
-    text_file=open('text/'+filename, 'rU', encoding='ansi')
+    text_file=open('text/'+filename, 'rU', encoding='latin1')
     for line in text_file:
         if line.startswith("text "):
             print(line[5:])
@@ -41,7 +41,7 @@ def display_text_file(filename):
         elif line.startswith("ascii "):
             display_asciiart(line[6:].rstrip())
         elif line.startswith("continue"):
-            input("Press RETURN to continue...")
+            input("Press ENTER to continue...")
         elif line.startswith("clear"):
             system('clear')
         stdout.flush()
