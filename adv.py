@@ -1,24 +1,26 @@
 #! python
-
+from os import environ
 from sys import stdout
 import random
 import time
 import inflect
 import adv_functions as adv
 
-DEBUG_MODE = False
-SUSPENSE_LEVEL = 0.1
+# DEBUG_MODE = False
+# Enable debugging if the DEBUG environment variable is set and starts with Y
+DEBUG_MODE = environ.get("DEBUG", "").lower().startswith('y') or environ.get("DEBUG", "").lower().startswith('t')
 
+SUSPENSE_LEVEL = 0.1
 LEVEL = 1
 GRIDREF = "D7"
 QUIT = False
-PLAY = True
 FIGHT = False
 BRIBE = False
 
 team = [adv.create_character("Player " + str(p), adv.outcome(0.6), 70, adv.outcome(0.6), 0) for p in range(1,random.randint(2,5))]
 
 if DEBUG_MODE: 
+    print("DEBUG_MODE=" + format(DEBUG_MODE))
     print("Characters: " + format(adv.characters))
     print("Team: " + format(team))
     print("Weapons: " + format(adv.weapons))
@@ -131,6 +133,3 @@ if GOLD:
 if DEBUG_MODE: 
     for key, value in adv.characters.items() :
         print (key, value)
-
-
-
